@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id "com.heroku.sdk.heroku-gradle" version "1.0.1"
+}
+
+sourceCompatibility = 9
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile project(':twitter-util')
+    compile project(':text-util')
+    compile project(':generator-util')
+    compile project(':chatbot-util')
+    compile project(':language-util')
+    compile project(':wikihow-scraper')
+    compile project(':words')
+    compile project(':dutch-datasets')
+    compile 'org.apache.commons:commons-lang3:3.5'
+    compile 'com.google.guava:guava:11.0.2'
+}
+
+heroku {
+    appName = "jeannine-bot"
+    processTypes(
+            worker: "java -jar build/libs/" + appName + ".jar -mode reply"
+    )
+    includes = ["D:\\Self\\Repositories\\" + appName + "\\system.properties"]
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'be.thomaswinters.samsonworld.jeannine.JeannineTwitterBot',
+        )
+    }
+    from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) })
+}
+
+task buildDeployHeroku {
+    dependsOn 'build'
+    dependsOn 'deployHeroku'
+    tasks.findByName('deployHeroku').mustRunAfter 'build'
+}

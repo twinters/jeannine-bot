@@ -1,0 +1,19 @@
+include ':twitter-util'
+project(':twitter-util').projectDir = new File(settingsDir, '../twitter-util')
+include ':text-util'
+project(':text-util').projectDir = new File(settingsDir, '../text-util')
+include ':chatbot-util'
+project(':chatbot-util').projectDir = new File(settingsDir, '../chatbot-util')
+include ':generator-util'
+project(':generator-util').projectDir = new File(settingsDir, '../generator-util')
+include ':language-util'
+project(':language-util').projectDir = new File(settingsDir, '../language-util')
+include ':wikihow-scraper'
+project(':wikihow-scraper').projectDir = new File(settingsDir, '../wikihow-scraper')
+include ':words'
+project(':words').projectDir = new File(settingsDir, '../words')
+include ':dutch-datasets'
+project(':dutch-datasets').projectDir = new File(settingsDir, '../dutch-datasets')
+
+rootProject.name = 'jeannine-bot'
+
