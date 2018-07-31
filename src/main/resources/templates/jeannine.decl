@@ -1,0 +1,39 @@
+// Input
+// titel = \titel(<voornaam> <achternaam>)
+// aanspreking = (<vaste_aanspreking>)/((<titel> /meneer )(<achternaam.capitaliseAll>/<voornaam.capitaliseAll>)/<voornaam>
+
+// Uitspraken
+ah = (A|O)h,
+he = (, hé){.5}
+octaafJongen = Octaaf(, mijn jongen){.85},
+
+// Actie beschrijvingen
+hetAction = (het <actionVerb> van <actionDescription>/<actionVerb>)
+actionWanneerGaat = (als|wanneer) je \ifdefined(<actionDescription> )gaat <actionVerb>
+daarover = {
+	2: voor( <hetAction.firstToSecondPersonPronouns>| <actionWanneerGaat.firstToSecondPersonPronouns>)
+	1: daarover(, hé){.6}
+}
+
+// Mutual patronen
+hobbyclubTip = ((tip|advies) van (mijn hobbyclub|de hobbyclub, waar ik voorzitster van ben,)|hobbyclubtip)
+
+// Template types
+vanZijnOuders = {
+	1: ((<ah> ){.2}dat is weer typisch<he>(, <hetAction.firstToThirdMalePersonPronouns>){.7}|Typisch)... Dat heeft hij( weer){.5} van zijn vader<he>!
+	1: ((<ah> (maar ){.1}){.5}goed zijn in <hetAction.firstToThirdMalePersonPronouns>, ){.7}(ja, ){.7}dat heeft hij van (zijn moeder|mij)<he>!
+}
+tipGeving = {
+	4: <octaafJongen> (je kent mijn( goede){.5}|een) <hobbyclubTip> <daarover>: <tip>
+	2: (<octaafJongen> je|Je) (weet|herinnert je nog) wat ik je( daarover){.5} heb gezegd<he>(! <tip.capitalise>|: <tip>)
+	1: (En onthoud goed|Je weet het<he>),( Octaaf,){.5} mijn jongen: <tip>
+}
+
+// Main
+octaafReply = <tipGeving.capitalise> / <vanZijnOuders.capitalise>
+
+reply = {
+	<ah> ik heb <daarover>( nog){.5} een <hobbyclubTip>(! <tip.capitalise>|: <tip.lower>)
+}
+
+main = <octaafReply>
