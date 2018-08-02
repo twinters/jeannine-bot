@@ -16,6 +16,7 @@ import twitter4j.User;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,17 +54,17 @@ public class JeannineTwitterBot {
 
         ITweetsFetcher tweetsToAnswerJeanine =
                 TwitterBot.MENTIONS_RETRIEVER.apply(jeannineTwitter)
-                        .combineWith(
+                        .combineWith(Arrays.asList(
                                 new TimelineTweetsFetcher(jeannineTwitter)
-                                        .combineWith(
-                                                botFriendsTweetsFetcher)
+                                        .combineWith(botFriendsTweetsFetcher)
                                         .filter(TwitterUnchecker.uncheck(AlreadyParticipatedFilter::new, jeannineTwitter, 4)),
-                                new SearchTweetsFetcher(jeannineTwitter, "jeannine de bolle")
-                                        .combineWith(
-                                                new SearchTweetsFetcher(jeannineTwitter, "jeanine de bolle"),
-                                                new SearchTweetsFetcher(jeannineTwitter, "mevrouw praline")
-                                        )
+                                new TweetsFetcherCombiner(
+                                        new SearchTweetsFetcher(jeannineTwitter, "jeannine de bolle"),
+                                        new SearchTweetsFetcher(jeannineTwitter, "jeanine de bolle"),
+                                        new SearchTweetsFetcher(jeannineTwitter, "mevrouw praline")
+                                )
                                         .filterRandomly(jeannineTwitter, 1, 4))
+                        )
                         // Filter out botfriends tweets randomly
                         .filterRandomlyIf(jeannineTwitter, e -> botFriends.contains(e.getUser()), 1, 20)
                         // Still reply to all octaaf tweets
@@ -73,7 +74,7 @@ public class JeannineTwitterBot {
                         // Filter out own tweets & retweets
                         .filterOutRetweets()
                         // Filter out already replied to messages
-                        .filterRandomlyIf(jeannineTwitter, alreadyRepliedToByOthersFilter, 1, 3)
+//                        .filterRandomlyIf(jeannineTwitter, alreadyRepliedToByOthersFilter, 1, 3)
                         .filterOutOwnTweets(jeannineTwitter)
                         .filterOutMessagesWithWords(prohibitedWordsToAnswer);
 
