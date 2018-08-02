@@ -26,7 +26,7 @@ dependencies {
 heroku {
     appName = "jeannine-bot"
     processTypes(
-            worker: "java -jar build/libs/" + appName + ".jar -mode reply"
+            worker: "java -jar build/libs/" + appName + ".jar -mode reply -runDuration 10h -replyWait 3m"
     )
     includes = ["D:\\Self\\Repositories\\" + appName + "\\system.properties"]
 }
