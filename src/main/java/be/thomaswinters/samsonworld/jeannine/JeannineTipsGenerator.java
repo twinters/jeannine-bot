@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class JeannineTipsGenerator implements IChatBot {
-    private final WikihowSearcher searcher = WikihowSearcher.fromEnvironment("nl", Duration.ofSeconds(1));
+//    private final WikihowSearcher searcher = WikihowSearcher.fromEnvironment("nl", Duration.ofSeconds(5));
     private final WikiHowPageScraper wikiHowPageScraper = new WikiHowPageScraper("nl");
     private final IFitnessFunction<String> tipFitnessFunction = e -> 1 / e.length();
     private final DutchFirstPersonConverter firstPersonConverter = new DutchFirstPersonConverter();
@@ -71,6 +71,7 @@ public class JeannineTipsGenerator implements IChatBot {
         List<String> searchWords = SentenceUtil.splitOnSpaces(search)
                 .map(String::toLowerCase)
                 .collect(Collectors.toList());
+        WikihowSearcher searcher = WikihowSearcher.fromEnvironment("nl", Duration.ofSeconds(5));
         List<PageCard> relatedPages = searcher.search(searchWords);
         return relatedPages
                 .stream()
