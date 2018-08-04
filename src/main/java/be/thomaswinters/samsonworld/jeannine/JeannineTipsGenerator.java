@@ -290,7 +290,6 @@ public class JeannineTipsGenerator implements IChatBot {
                 .filter(e -> e.length() > 0)
                 .filter(this::isValidTip)
                 .map(this::decapitalise)
-                .map(this::cleanTip)
-                .collect(Collectors.toList());
+                .map(this::cleanTip);
     }
 }
