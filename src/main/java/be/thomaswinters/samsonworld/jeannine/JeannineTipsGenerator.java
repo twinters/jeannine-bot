@@ -152,6 +152,14 @@ public class JeannineTipsGenerator implements IChatBot {
         return result;
     }
 
+    public Stream<String> scrapeRandomTips() {
+        try {
+            return wikiHowPageScraper.scrapeRandom().getTips().stream();
+        } catch (IOException e) {
+            return Stream.of();
+        }
+    }
+
     @Override
     public Optional<String> generateReply(IChatMessage message) {
         String messageText = SentenceUtil.splitOnSpaces(message.getText())
@@ -210,15 +218,10 @@ public class JeannineTipsGenerator implements IChatBot {
 
             List<String> tips = new ArrayList<>();
             try {
-                tips = getFirstTipsIn(getPages(fullActionText))
-                        .stream()
-                        .map(SentenceUtil::getFirstSentence)
-                        .map(String::trim)
-                        .filter(e -> e.length() > 0)
-                        .filter(this::isValidTip)
-                        .map(this::decapitalise)
-                        .map(this::cleanTip)
+                tips = mapTips(
+                        getFirstTipsIn(getPages(fullActionText)).stream())
                         .collect(Collectors.toList());
+
             } catch (HttpStatusException e) {
                 if (e.getStatusCode() == 404) {
                     System.out.println("404 for " + fullActionText);
@@ -228,6 +231,26 @@ public class JeannineTipsGenerator implements IChatBot {
                 e.printStackTrace();
             }
             System.out.println("FOUND TIPS: " + tips);
+
+            // If no tips found, use random tips
+            if (tips.isEmpty()) {
+                try {
+                    ExperimentalWordCountingReplyGenerator replier = new ExperimentalWordCountingReplyGenerator(
+                            ((IStreamGenerator<String>) this::scrapeRandomTips)
+                                    .makeInfinite()
+                                    .mapStream(this::mapTips)
+                                    .limit(200),
+                            WordCounterIO.read(ClassLoader.getSystemResource("ngrams/twitter/1-grams.csv")),
+                            new ConversationCollector("JeannineBot", 2),
+                            ExperimentalWordCountingReplyGenerator.SECOND_MAPPER
+                    );
+                    tips = replier.generateReply(message).stream().collect(Collectors.toList());
+                    System.out.println("GENERATED TIP: " + tips);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
 
             if (!tips.isEmpty()) {
                 Optional<String> selectedTip = tipSelector.select(tips.stream());
@@ -242,7 +265,7 @@ public class JeannineTipsGenerator implements IChatBot {
                 }
             }
             try {
-                System.out.println("GENERATING RESULT USING REGISTER: "+register);
+                System.out.println("GENERATING RESULT USING REGISTER: " + register);
                 String result =
                         templatedGenerator.generate(generatorToUse,
                                 new TextGeneratorContext(register, true)
@@ -258,5 +281,16 @@ public class JeannineTipsGenerator implements IChatBot {
         return Optional.empty();
 
 
+    }
+
+    private final Stream<String> mapTips(Stream<String> rawTips) {
+        return rawTips
+                .map(SentenceUtil::getFirstSentence)
+                .map(String::trim)
+                .filter(e -> e.length() > 0)
+                .filter(this::isValidTip)
+                .map(this::decapitalise)
+                .map(this::cleanTip)
+                .collect(Collectors.toList());
     }
 }
