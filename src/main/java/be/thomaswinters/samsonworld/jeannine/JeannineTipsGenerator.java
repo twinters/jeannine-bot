@@ -3,10 +3,13 @@ package be.thomaswinters.samsonworld.jeannine;
 import be.thomaswinters.action.ActionExtractor;
 import be.thomaswinters.action.data.ActionDescription;
 import be.thomaswinters.chatbot.IChatBot;
+import be.thomaswinters.chatbot.bots.experimental.ExperimentalWordCountingReplyGenerator;
 import be.thomaswinters.chatbot.data.IChatMessage;
+import be.thomaswinters.chatbot.util.ConversationCollector;
 import be.thomaswinters.generator.fitness.IFitnessFunction;
 import be.thomaswinters.generator.selection.ISelector;
 import be.thomaswinters.generator.selection.TournamentSelection;
+import be.thomaswinters.generator.streamgenerator.IStreamGenerator;
 import be.thomaswinters.language.dutch.DutchFirstPersonConverter;
 import be.thomaswinters.random.Picker;
 import be.thomaswinters.replacement.Replacer;
@@ -24,15 +27,18 @@ import be.thomaswinters.wikihow.WikiHowPageScraper;
 import be.thomaswinters.wikihow.WikihowSearcher;
 import be.thomaswinters.wikihow.data.Page;
 import be.thomaswinters.wikihow.data.PageCard;
+import be.thomaswinters.wordcounter.io.WordCounterIO;
 import org.jsoup.HttpStatusException;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class JeannineTipsGenerator implements IChatBot {
-//    private final WikihowSearcher searcher = WikihowSearcher.fromEnvironment("nl", Duration.ofSeconds(5));
+    private final WikihowSearcher loggedInSearcher = WikihowSearcher.fromEnvironment("nl", Duration.ofSeconds(5));
+    private final WikihowSearcher anonymousSearcher = new WikihowSearcher("nl", null, Duration.ofSeconds(5));
     private final WikiHowPageScraper wikiHowPageScraper = new WikiHowPageScraper("nl");
     private final IFitnessFunction<String> tipFitnessFunction = e -> 1 / e.length();
     private final DutchFirstPersonConverter firstPersonConverter = new DutchFirstPersonConverter();
@@ -71,8 +77,14 @@ public class JeannineTipsGenerator implements IChatBot {
         List<String> searchWords = SentenceUtil.splitOnSpaces(search)
                 .map(String::toLowerCase)
                 .collect(Collectors.toList());
-        WikihowSearcher searcher = WikihowSearcher.fromEnvironment("nl", Duration.ofSeconds(5));
-        List<PageCard> relatedPages = searcher.search(searchWords);
+
+        // Search for pages
+        List<PageCard> relatedPages = loggedInSearcher.search(searchWords);
+        if (relatedPages.isEmpty()) {
+            System.out.println("NO PAGES FOUND WHILE LOGGED IN, TRYING ANONYMOUS");
+            anonymousSearcher.search(searchWords);
+        }
+
         return relatedPages
                 .stream()
                 // Sort by decreasing amount of matchine words
