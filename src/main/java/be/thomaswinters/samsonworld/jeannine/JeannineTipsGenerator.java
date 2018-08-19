@@ -160,6 +160,28 @@ public class JeannineTipsGenerator implements IChatBot {
         }
     }
 
+    private List<String> createRandomTipReplier(IChatMessage originalMessage, String actionVerb, String actionSentence) throws IOException {
+        IChatMessage fakeMessage = new ChatMessage(Optional.empty(),
+                actionVerb + " " + actionSentence, originalMessage.getUser());
+        ExperimentalWordCountingReplyGenerator replier = new ExperimentalWordCountingReplyGenerator(
+                ((IStreamGenerator<String>) (() -> {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    return this.scrapeRandomTips();
+                }))
+                        .makeInfinite()
+                        .mapStream(this::mapTips)
+                        .limit(1300),
+                WordCounterIO.read(ClassLoader.getSystemResource("ngrams/twitter/1-grams.csv")),
+                new ConversationCollector("JeannineBot", 2),
+                ExperimentalWordCountingReplyGenerator.SECOND_MAPPER
+        );
+        return replier.generateReply(fakeMessage).stream().collect(Collectors.toList());
+    }
+
     @Override
     public Optional<String> generateReply(IChatMessage message) {
         String messageText = SentenceUtil.splitOnSpaces(message.getText())
@@ -207,7 +229,7 @@ public class JeannineTipsGenerator implements IChatBot {
 
             String actionVerb = actionDescription.get().getVerb();
             String actionSentence = actionDescription.get().getRestOfSentence().trim();
-            String fullActionText = actionSentence + " " + actionVerb;
+            String fullActionText = actionDescription.get().getAsText();
 
             register.createGenerator("actionVerb", actionVerb);
             if (actionSentence.length() > 0) {
@@ -216,35 +238,12 @@ public class JeannineTipsGenerator implements IChatBot {
             }
 
 
-            List<String> tips = new ArrayList<>();
-            try {
-                tips = mapTips(
-                        getFirstTipsIn(getPages(fullActionText)).stream())
-                        .collect(Collectors.toList());
-
-            } catch (HttpStatusException e) {
-                if (e.getStatusCode() == 404) {
-                    System.out.println("404 for " + fullActionText);
-                }
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            List<String> tips = searchForBasicTips(fullActionText);
             System.out.println("FOUND TIPS: " + tips);
-
             // If no tips found, use random tips
             if (tips.isEmpty()) {
                 try {
-                    ExperimentalWordCountingReplyGenerator replier = new ExperimentalWordCountingReplyGenerator(
-                            ((IStreamGenerator<String>) this::scrapeRandomTips)
-                                    .makeInfinite()
-                                    .mapStream(this::mapTips)
-                                    .limit(200),
-                            WordCounterIO.read(ClassLoader.getSystemResource("ngrams/twitter/1-grams.csv")),
-                            new ConversationCollector("JeannineBot", 2),
-                            ExperimentalWordCountingReplyGenerator.SECOND_MAPPER
-                    );
-                    tips = replier.generateReply(message).stream().collect(Collectors.toList());
+                    tips = createRandomTipReplier(, actionVerb, actionSentence);
                     System.out.println("GENERATED TIP: " + tips);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -281,6 +280,24 @@ public class JeannineTipsGenerator implements IChatBot {
         return Optional.empty();
 
 
+    }
+
+    private List<String> searchForBasicTips(String fullActionText) {
+        List<String> tips = new ArrayList<>();
+        try {
+            tips = mapTips(
+                    getFirstTipsIn(getPages(fullActionText)).stream())
+                    .collect(Collectors.toList());
+
+        } catch (HttpStatusException e) {
+            if (e.getStatusCode() == 404) {
+                System.out.println("404 for " + fullActionText);
+            }
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return tips;
     }
 
     private final Stream<String> mapTips(Stream<String> rawTips) {
