@@ -4,6 +4,7 @@ import be.thomaswinters.action.ActionExtractor;
 import be.thomaswinters.action.data.ActionDescription;
 import be.thomaswinters.chatbot.IChatBot;
 import be.thomaswinters.chatbot.bots.experimental.ExperimentalWordCountingReplyGenerator;
+import be.thomaswinters.chatbot.data.ChatMessage;
 import be.thomaswinters.chatbot.data.IChatMessage;
 import be.thomaswinters.chatbot.util.ConversationCollector;
 import be.thomaswinters.generator.fitness.IFitnessFunction;
@@ -79,7 +80,12 @@ public class JeannineTipsGenerator implements IChatBot {
                 .collect(Collectors.toList());
 
         // Search for pages
-        List<PageCard> relatedPages = loggedInSearcher.search(searchWords);
+        System.out.println("Search using advanced");
+        List<PageCard> relatedPages = loggedInSearcher.searchAdvanced(searchWords);
+        if (relatedPages.isEmpty()) {
+            System.out.println("Advanced search FAILED to find a page, using basic search now");
+            relatedPages = loggedInSearcher.search(searchWords);
+        }
         if (relatedPages.isEmpty()) {
             System.out.println("NO PAGES FOUND WHILE LOGGED IN, TRYING ANONYMOUS");
             anonymousSearcher.search(searchWords);
@@ -113,7 +119,9 @@ public class JeannineTipsGenerator implements IChatBot {
     private List<String> getFirstTipsIn(List<Page> pages) {
         return pages
                 .stream()
+                .peek(e -> System.out.println("Found page for tip: " + e.getTitle()))
                 .filter(e -> !e.getTips().isEmpty())
+                .peek(e -> System.out.println("Found page containing tips:: " + e.getTitle() + ": " + e.getTips()))
                 .map(Page::getTips)
                 .findFirst()
                 .orElse(new ArrayList<>());
@@ -160,9 +168,9 @@ public class JeannineTipsGenerator implements IChatBot {
         }
     }
 
-    private List<String> createRandomTipReplier(IChatMessage originalMessage, String actionVerb, String actionSentence) throws IOException {
+    private List<String> createRandomTipReplier(IChatMessage originalMessage, String fullActionText) throws IOException {
         IChatMessage fakeMessage = new ChatMessage(Optional.empty(),
-                actionVerb + " " + actionSentence, originalMessage.getUser());
+                fullActionText, originalMessage.getUser());
         ExperimentalWordCountingReplyGenerator replier = new ExperimentalWordCountingReplyGenerator(
                 ((IStreamGenerator<String>) (() -> {
                     try {
@@ -238,12 +246,12 @@ public class JeannineTipsGenerator implements IChatBot {
             }
 
 
-            List<String> tips = searchForBasicTips(fullActionText);
+            List<String> tips = searchForTips(fullActionText);
             System.out.println("FOUND TIPS: " + tips);
             // If no tips found, use random tips
             if (tips.isEmpty()) {
                 try {
-                    tips = createRandomTipReplier(, actionVerb, actionSentence);
+                    tips = createRandomTipReplier(message, fullActionText);
                     System.out.println("GENERATED TIP: " + tips);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -282,13 +290,9 @@ public class JeannineTipsGenerator implements IChatBot {
 
     }
 
-    private List<String> searchForBasicTips(String fullActionText) {
-        List<String> tips = new ArrayList<>();
+    List<String> searchForTips(String fullActionText) {
         try {
-            tips = mapTips(
-                    getFirstTipsIn(getPages(fullActionText)).stream())
-                    .collect(Collectors.toList());
-
+            return extractTips(getPages(fullActionText));
         } catch (HttpStatusException e) {
             if (e.getStatusCode() == 404) {
                 System.out.println("404 for " + fullActionText);
@@ -297,7 +301,15 @@ public class JeannineTipsGenerator implements IChatBot {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return tips;
+        return new ArrayList<>();
+    }
+
+
+    private List<String> extractTips(List<Page> pages) {
+        return mapTips(
+                getFirstTipsIn(pages).stream())
+                .collect(Collectors.toList());
+
     }
 
     private final Stream<String> mapTips(Stream<String> rawTips) {
@@ -309,4 +321,5 @@ public class JeannineTipsGenerator implements IChatBot {
                 .map(this::decapitalise)
                 .map(this::cleanTip);
     }
+
 }
