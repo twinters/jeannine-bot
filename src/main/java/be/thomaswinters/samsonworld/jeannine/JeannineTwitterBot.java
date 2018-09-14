@@ -66,7 +66,7 @@ public class JeannineTwitterBot {
                                         .filterRandomly(jeannineTwitter, 1, 4))
                         )
                         // Filter out botfriends tweets randomly
-                        .filterRandomlyIf(jeannineTwitter, e -> botFriends.contains(e.getUser()), 1, 20)
+                        .filterRandomlyIf(jeannineTwitter, e -> botFriends.contains(e.getUser()), 1, 15)
                         // Still reply to all octaaf tweets
                         .combineWith(
                                 new UserTweetsFetcher(jeannineTwitter, "OctaafBot")
