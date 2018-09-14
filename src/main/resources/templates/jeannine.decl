@@ -5,35 +5,40 @@
 // Uitspraken
 ah = (A|O)h,
 he = (, hé){.5}
-octaafJongen = Octaaf(, mijn jongen){.85},
+octaaf_jongen = Octaaf(, mijn jongen){.85},
 
 // Actie beschrijvingen
-hetAction = (het <actionVerb> van <actionDescription>/<actionVerb>)
-actionWanneerGaat = (als|wanneer) je \ifdefined(<actionDescription> )gaat <actionVerb>
+het_action = (het <actionVerb> van <actionDescription>/<actionVerb>)
+action_wanneer_gaat = (als|wanneer) je \ifdefined(<actionDescription> )gaat <actionVerb>
 daarover = {
-	2: voor( <hetAction.firstToSecondPersonPronouns>| <actionWanneerGaat.firstToSecondPersonPronouns>)
+	2: voor( <het_action.firstToSecondPersonPronouns>| <action_wanneer_gaat.firstToSecondPersonPronouns>)
 	1: daarover(, hé){.6}
 }
 
 // Mutual patronen
-hobbyclubTip = ((tip|advies) van (mijn hobbyclub|de hobbyclub, waar ik voorzitster van ben,)|hobbyclubtip)
+hobby_club_tip = ((tip|advies) van (mijn hobbyclub|de hobbyclub, waar ik voorzitster van ben,)|hobby_club_tip)
+denk_eraan = (Denk er aan<he>|Niet vergeten|Je weet wat ik je altijd zeg<he>)
 
 // Template types
-vanZijnOuders = {
-	1: ((<ah> ){.2}dat is weer typisch<he>(, <hetAction.firstToThirdMalePersonPronouns>){.7}|Typisch)... Dat heeft hij( weer){.5} van zijn vader<he>!
-	1: ((<ah> (maar ){.1}){.5}goed zijn in <hetAction.firstToThirdMalePersonPronouns>, ){.7}(ja, ){.7}dat heeft hij van (zijn moeder|mij)<he>!
+van_zijn_ouders = {
+	1: ((<ah> ){.2}dat is weer typisch<he>(, <het_action.firstToThirdMalePersonPronouns>){.7}|Typisch)... Dat heeft hij( weer){.5} van zijn vader<he>!
+	1: ((<ah> (maar ){.1}){.5}goed zijn in <het_action.firstToThirdMalePersonPronouns>, ){.7}(ja, ){.7}dat heeft hij van (zijn moeder|mij)<he>!
 }
-tipGeving = {
-	4: <octaafJongen> (je kent mijn( goede){.5}|een) <hobbyclubTip> <daarover>: <tip>
-	2: (<octaafJongen> je|Je) (weet|herinnert je nog) wat ik je( daarover){.5} heb gezegd<he>(! <tip.capitalise>|: <tip>)
-	1: (En onthoud goed|Je weet het<he>),( Octaaf,){.5} mijn jongen: <tip>
+tip_geving = {
+	2: <octaaf_jongen> (je kent mijn( goede){.5}|een) <hobby_club_tip> <daarover>: <tip>
+	2: (<octaaf_jongen> je|Je) (weet|herinnert je nog) wat ik je( daarover){.5} heb gezegd<he>(! <tip.capitalise>|: <tip>)
+	2: (En onthoud goed|Je weet het<he>),( Octaaf,){.5} mijn jongen: <tip>
+	3: (<het_action.capitalise>? ){.3}<denk_eraan>, <octaaf_jongen>: <tip>
 }
 
 // Main
-octaafReply = <tipGeving.capitalise> / <vanZijnOuders.capitalise>
+octaaf_reply = <tip_geving.capitalise> / <van_zijn_ouders.capitalise>
 
 reply = {
-	<ah> ik heb( nog){.5} een <hobbyclubTip> <daarover>(! <tip.capitalise>|: <tip.lower>)
+	1: <ah> ik heb( nog){.5} een <hobby_club_tip> <daarover>(! <tip.capitalise>|: <tip.lower>)
+	1: Je weet wat( dan){.3} ik altijd zeg<he>: <tip>
+	1: Onthoud goed: <tip>
+	1: <het_action.capitalise>? <denk_eraan>: <tip> 
 }
 
-main = <octaafReply>
+main = <octaaf_reply>
