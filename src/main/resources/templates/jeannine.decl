@@ -4,20 +4,20 @@
 
 // Uitspraken
 ah = (A|O)h,
-he = (, hé){.5}
-octaaf_jongen = Octaaf(, mijn jongen){.85},
+he = (, hé){.7}
+octaaf_jongen = Octaaf(, mijn jongen){.85}
 
 // Actie beschrijvingen
-het_action = (het <actionVerb> van <actionDescription>/<actionVerb>)
-action_wanneer_gaat = (als|wanneer) je \ifdefined(<actionDescription> )gaat <actionVerb>
+het_action = (het <actionVerb> van <actionDescription.lower>/<actionVerb.lower>)
+action_wanneer_gaat = (als|wanneer) je \ifdefined(<actionDescription> )gaat <actionVerb.lower>
 daarover = {
 	2: voor( <het_action.firstToSecondPersonPronouns>| <action_wanneer_gaat.firstToSecondPersonPronouns>)
 	1: daarover(, hé){.6}
 }
 
 // Mutual patronen
-hobby_club_tip = ((tip|advies) van (mijn hobbyclub|de hobbyclub, waar ik voorzitster van ben,)|hobby_club_tip)
-denk_eraan = (Denk er aan<he>|Niet vergeten|Je weet wat ik je altijd zeg<he>)
+hobby_club_tip = ((tip|advies) van (mijn hobbyclub|de hobbyclub, waar ik voorzitster van ben,)|hobbyclubtip)
+denk_eraan = (Denk er aan<he>|Niet mijn tip vergeten<he>|Je weet wat ik je altijd zeg<he>)
 
 // Template types
 van_zijn_ouders = {
@@ -25,8 +25,8 @@ van_zijn_ouders = {
 	1: ((<ah> (maar ){.1}){.5}goed zijn in <het_action.firstToThirdMalePersonPronouns>, ){.7}(ja, ){.7}dat heeft hij van (zijn moeder|mij)<he>!
 }
 tip_geving = {
-	2: <octaaf_jongen> (je kent mijn( goede){.5}|een) <hobby_club_tip> <daarover>: <tip>
-	2: (<octaaf_jongen> je|Je) (weet|herinnert je nog) wat ik je( daarover){.5} heb gezegd<he>(! <tip.capitalise>|: <tip>)
+	2: <octaaf_jongen>, (je kent mijn( goede){.5}|een) <hobby_club_tip> <daarover>: <tip>
+	2: (<octaaf_jongen>, je|Je) (weet|herinnert je nog) wat ik je( daarover){.5} heb gezegd<he>(! <tip.capitalise>|: <tip>)
 	2: (En onthoud goed|Je weet het<he>),( Octaaf,){.5} mijn jongen: <tip>
 	3: (<het_action.capitalise>? ){.3}<denk_eraan>, <octaaf_jongen>: <tip>
 }

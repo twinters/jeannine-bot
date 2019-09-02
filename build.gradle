@@ -20,8 +20,8 @@ dependencies {
     compile project(':words')
     compile project(':dutch-datasets')
     compile 'org.apache.commons:commons-lang3:3.5'
-    compile 'com.google.guava:guava:11.0.2'
     compile 'org.junit.jupiter:junit-jupiter-api:5.1.0'
+    compile 'com.google.guava:guava:19.0'
 }
 
 heroku {

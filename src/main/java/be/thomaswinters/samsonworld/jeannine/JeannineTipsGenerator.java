@@ -203,7 +203,7 @@ public class JeannineTipsGenerator implements IChatBot {
         Optional<ActionDescription> actionDescription = Optional.empty();
 
         if (message.getUser().getScreenName().toLowerCase().contains("octaaf")) {
-            generatorToUse = "octaafReply";
+            generatorToUse = "octaaf_reply";
 
             // Check if it contains an action
             if (messageText.contains("specialiteiten")) {
