@@ -10,8 +10,8 @@ include ':language-util'
 project(':language-util').projectDir = new File(settingsDir, '../language-util')
 include ':wikihow-scraper'
 project(':wikihow-scraper').projectDir = new File(settingsDir, '../wikihow-scraper')
-include ':words'
-project(':words').projectDir = new File(settingsDir, '../words')
+include ':babbly'
+project(':babbly').projectDir = new File(settingsDir, '../babbly')
 include ':dutch-datasets'
 project(':dutch-datasets').projectDir = new File(settingsDir, '../dutch-datasets')
 

@@ -17,7 +17,7 @@ dependencies {
     compile project(':chatbot-util')
     compile project(':language-util')
     compile project(':wikihow-scraper')
-    compile project(':words')
+    compile project(':babbly')
     compile project(':dutch-datasets')
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'org.junit.jupiter:junit-jupiter-api:5.1.0'
