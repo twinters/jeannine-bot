@@ -3,10 +3,12 @@ plugins {
     id "com.heroku.sdk.heroku-gradle" version "1.0.1"
 }
 
+
 sourceCompatibility = 9
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -20,8 +22,14 @@ dependencies {
     compile project(':babbly')
     compile project(':dutch-datasets')
     compile 'org.apache.commons:commons-lang3:3.5'
-    compile 'org.junit.jupiter:junit-jupiter-api:5.1.0'
     compile 'com.google.guava:guava:19.0'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 heroku {
