@@ -105,3 +105,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 src/main/resources/experiments/
+
+.idea/
+gradle/
+gradlew
+gradlew.bat
