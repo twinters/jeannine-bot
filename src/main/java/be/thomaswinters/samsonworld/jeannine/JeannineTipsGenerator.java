@@ -43,12 +43,12 @@ public class JeannineTipsGenerator implements IChatBot {
     private final WikihowSearcher loggedInSearcher = WikihowSearcher.fromEnvironment("nl", Duration.ofSeconds(5));
     private final WikihowSearcher anonymousSearcher = new WikihowSearcher("nl", null, Duration.ofSeconds(5));
     private final WikiHowPageScraper wikiHowPageScraper = new WikiHowPageScraper("nl");
-    private final IFitnessFunction<String> tipFitnessFunction = e -> 1 / e.length();
+    private final IFitnessFunction<String> tipFitnessFunction = e -> 1.0 / e.length();
     private final DutchFirstPersonConverter firstPersonConverter = new DutchFirstPersonConverter();
     private final ISelector<String> tipSelector = new TournamentSelection<>(tipFitnessFunction, 5);
     private final DeclarationFileTextGenerator templatedGenerator;
     private final ActionExtractor actionExtractor = new ActionExtractor();
-    private Replacers tipNegators = new Replacers(Arrays.asList(
+    private final Replacers tipNegators = new Replacers(Arrays.asList(
             new Replacer("een", "geen", false, true),
             new Replacer("goed", "slecht", false, true),
             new Replacer("de meeste", "zeer weinig", false, true),
