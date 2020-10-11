@@ -4,7 +4,7 @@
 
 // Uitspraken
 ah = (A|O)h,
-he = (, hé){.7}
+he = (, he){.7}
 octaaf_jongen = Octaaf(, mijn jongen){.5}
 
 // Actie beschrijvingen
