@@ -8,6 +8,7 @@ import be.thomaswinters.chatbot.data.ChatMessage;
 import be.thomaswinters.chatbot.data.IChatMessage;
 import be.thomaswinters.chatbot.util.ConversationCollector;
 import be.thomaswinters.generator.fitness.IFitnessFunction;
+import be.thomaswinters.generator.generators.IGenerator;
 import be.thomaswinters.generator.selection.ISelector;
 import be.thomaswinters.generator.selection.TournamentSelection;
 import be.thomaswinters.generator.streamgenerator.IStreamGenerator;
@@ -28,6 +29,7 @@ import be.thomaswinters.wikihow.WikiHowPageScraper;
 import be.thomaswinters.wikihow.WikihowSearcher;
 import be.thomaswinters.wikihow.data.Page;
 import be.thomaswinters.wikihow.data.PageCard;
+import be.thomaswinters.wordcounter.WordCounter;
 import be.thomaswinters.wordcounter.io.WordCounterIO;
 import org.jsoup.HttpStatusException;
 
@@ -171,19 +173,25 @@ public class JeannineTipsGenerator implements IChatBot {
     private List<String> createRandomTipReplier(IChatMessage originalMessage, String fullActionText) throws IOException {
         IChatMessage fakeMessage = new ChatMessage(Optional.empty(),
                 fullActionText, originalMessage.getUser());
+        IGenerator<String> tweetGenerator = ((IStreamGenerator<String>) (() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return this.scrapeRandomTips();
+        }))
+                .makeInfinite()
+                .mapStream(this::mapTips)
+                .limit(1300)
+                .reduceToGenerator();
+        WordCounter wc = WordCounterIO.read(ClassLoader.getSystemResource("ngrams/twitter/1-grams.csv"));
+
+
         ExperimentalWordCountingReplyGenerator replier = new ExperimentalWordCountingReplyGenerator(
-                ((IStreamGenerator<String>) (() -> {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    return this.scrapeRandomTips();
-                }))
-                        .makeInfinite()
-                        .mapStream(this::mapTips)
-                        .limit(1300),
-                WordCounterIO.read(ClassLoader.getSystemResource("ngrams/twitter/1-grams.csv")),
+                tweetGenerator,
+                wc,
+                10,
                 new ConversationCollector("JeannineBot", 2),
                 ExperimentalWordCountingReplyGenerator.SECOND_MAPPER
         );
