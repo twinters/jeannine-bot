@@ -3,6 +3,7 @@ plugins {
     id "com.heroku.sdk.heroku-gradle" version "1.0.1"
 }
 
+javadoc.options.encoding = 'UTF-8'
 
 sourceCompatibility = 9
 
