@@ -183,7 +183,7 @@ public class JeannineTipsGenerator implements IChatBot {
         }))
                 .makeInfinite()
                 .mapStream(this::mapTips)
-//                .limit(5)
+                .limit(5)
                 .reduceToGenerator();
         WordCounter wc = WordCounterIO.read(ClassLoader.getSystemResource("ngrams/twitter/1-grams.csv"));
 

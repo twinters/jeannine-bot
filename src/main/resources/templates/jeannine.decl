@@ -16,7 +16,7 @@ daarover = {
 }
 
 // Mutual patronen
-hobby_club_tip = ((tip|advies) van (de hobbyclub|mijn hobbyclub|de hobbyclub waar ik voorzitster van ben)|hobbyclubtip)
+hobby_club_tip = ((tip|advies|wijsheid|goede raad) van (de hobbyclub|mijn hobbyclub|de hobbyclub waar ik voorzitster van ben)|hobbyclubtip)
 denk_eraan = (Denk er aan<he>|Niet mijn tip vergeten<he>|Je weet wat ik je altijd zeg<he>)
 
 // Template types
@@ -42,6 +42,7 @@ reply = {
 	1: Een <hobby_club_tip>: <quotemarks:><tip><quotemarks:>
 	1: Je weet wat ik altijd zeg<he>: <quotemarks:><tip><quotemarks:>
 	1: Onthoud goed: <quotemarks:><tip><quotemarks:>
+	1: Een goede levenswijsheid( is){.5}: "<tip>"
 	1: <het_action.capitalise>? <denk_eraan>: <quotemarks:><tip><quotemarks:>
 }
 
