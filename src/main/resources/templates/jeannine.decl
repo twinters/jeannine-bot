@@ -5,18 +5,18 @@
 // Uitspraken
 ah = (A|O)h,
 he = (, hé){.7}
-octaaf_jongen = Octaaf(, mijn jongen){.85}
+octaaf_jongen = Octaaf(, mijn jongen){.5}
 
 // Actie beschrijvingen
 het_action = (het <actionVerb> van <actionDescription.lower>/<actionVerb.lower>)
 action_wanneer_gaat = (als|wanneer) je \ifdefined(<actionDescription> )gaat <actionVerb.lower>
 daarover = {
 	2: voor( <het_action.firstToSecondPersonPronouns>| <action_wanneer_gaat.firstToSecondPersonPronouns>)
-	1: daarover(, hé){.6}
+	1: daarover(, he){.3}
 }
 
 // Mutual patronen
-hobby_club_tip = ((tip|advies) van (mijn hobbyclub|de hobbyclub, waar ik voorzitster van ben,)|hobbyclubtip)
+hobby_club_tip = ((tip|advies) van (de hobbyclub|mijn hobbyclub|de hobbyclub waar ik voorzitster van ben)|hobbyclubtip)
 denk_eraan = (Denk er aan<he>|Niet mijn tip vergeten<he>|Je weet wat ik je altijd zeg<he>)
 
 // Template types
@@ -25,20 +25,24 @@ van_zijn_ouders = {
 	1: ((<ah> (maar ){.1}){.5}goed zijn in <het_action.firstToThirdMalePersonPronouns>, ){.7}(ja, ){.7}dat heeft hij van (zijn moeder|mij)<he>!
 }
 tip_geving = {
-	2: <octaaf_jongen>, (je kent mijn( goede){.5}|een) <hobby_club_tip> <daarover>: <tip>
+	2: <octaaf_jongen>, (je kent mijn( goede){.5}|een) <hobby_club_tip> <daarover>: <quotemarks:><tip><quotemarks:>
+	3: Luister goed naar je moeke he: <tip>
 	2: (<octaaf_jongen>, je|Je) (weet|herinnert je nog) wat ik je( daarover){.5} heb gezegd<he>(! <tip.capitalise>|: <tip>)
-	2: (En onthoud goed|Je weet het<he>),( Octaaf,){.5} mijn jongen: <tip>
-	3: (<het_action.capitalise>? ){.3}<denk_eraan>, <octaaf_jongen>: <tip>
+	2: (En onthoud goed|Je weet het<he>),( Octaaf,){.5} mijn jongen: <quotemarks:><tip><quotemarks:>
+	3: (<het_action.capitalise>? ){.3}<denk_eraan>, <octaaf_jongen>: <quotemarks:><tip><quotemarks:>
 }
 
 // Main
 octaaf_reply = <tip_geving.capitalise> / <van_zijn_ouders.capitalise>
 
+quotemarks = "{.5}
+
 reply = {
 	1: <ah> ik heb( nog){.5} een <hobby_club_tip> <daarover>(! <tip.capitalise>|: <tip.lower>)
-	1: Je weet wat( dan){.3} ik altijd zeg<he>: <tip>
-	1: Onthoud goed: <tip>
-	1: <het_action.capitalise>? <denk_eraan>: <tip> 
+	1: Een <hobby_club_tip>: <quotemarks:><tip><quotemarks:>
+	1: Je weet wat ik altijd zeg<he>: <quotemarks:><tip><quotemarks:>
+	1: Onthoud goed: <quotemarks:><tip><quotemarks:>
+	1: <het_action.capitalise>? <denk_eraan>: <quotemarks:><tip><quotemarks:>
 }
 
 main = <octaaf_reply>
